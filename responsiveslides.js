@@ -25,6 +25,7 @@
       "nextText": "Next",       // String: Text for the "next" button
       "maxwidth": "",           // Integer: Max-width of the slideshow, in pixels
       "navContainer": "",       // Selector: Where auto generated controls should be appended to, default is after the <ul>
+      "galleryWrapper": false,       // Boolean: create a div to wrap the rslides pager/next/prev elements so positioning can be done relative relative to nav, not gallery template, works if pager and/or nav is also true
       "manualControls": "",     // Selector: Declare custom pager navigation
       "namespace": "rslides",   // String: change the default namespace used
       "before": $.noop,         // Function: Before callback
@@ -188,13 +189,16 @@
               "<a href='#' class='" + slideClassPrefix + n + "'>" + n + "</a>" +
               "</li>";
           });
+
           $pager.append(tabMarkup);
 
-          // Inject pager
-          if (options.navContainer) {
-            $(settings.navContainer).append($pager);
-          } else {
-            $this.after($pager);
+          if(!settings.galleryWrapper) {
+              // Inject pager
+              if (options.navContainer) {
+                $(settings.navContainer).append($pager);
+              } else {
+                $this.after($pager);
+              }
           }
         }
 
@@ -311,12 +315,26 @@
             "<a href='#' class='" + navClass + " prev'>" + settings.prevText + "</a>" +
             "<a href='#' class='" + navClass + " next'>" + settings.nextText + "</a>";
 
-          // Inject navigation
-          if (options.navContainer) {
-            $(settings.navContainer).append(navMarkup);
-          } else {
-            $this.after(navMarkup);
-          }
+
+            if (settings.galleryWrapper) {
+                // Inject navigation
+
+                var $wrapper_div = $('<div class="rslidesNavWrapper"/>')
+                $wrapper_div.append($pager.after(navMarkup));
+                // Inject pager because it was not yet injected
+                $this.after($wrapper_div);
+            } else {
+                // Inject navigation
+              if (options.navContainer) {
+                $(settings.navContainer).append(navMarkup);
+              } else {
+                $this.after(navMarkup);
+              }
+            }
+
+
+
+
 
           var $trigger = $("." + namespaceIdx + "_nav"),
             $prev = $trigger.filter(".prev");
